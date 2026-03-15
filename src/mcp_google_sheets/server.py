@@ -175,6 +175,14 @@ mcp = FastMCP("Google Spreadsheet",
               port=_resolved_port)
 
 
+# Health endpoint for keep-alive pings (e.g. UptimeRobot on Render free tier)
+from starlette.responses import JSONResponse
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request):
+    return JSONResponse({"status": "ok"})
+
+
 def tool(annotations: Optional[ToolAnnotations] = None):
     """
     Conditional tool decorator that only registers tools if they're enabled.
@@ -1395,7 +1403,7 @@ def main():
         print(f"Tool filtering enabled. Active tools: {', '.join(sorted(ENABLED_TOOLS))}")
     else:
         print("Tool filtering disabled. All tools are enabled.")
-    
+
     # Run the server
     transport = "stdio"
     for i, arg in enumerate(sys.argv):
